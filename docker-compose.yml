@@ -7,8 +7,16 @@ services:
         environment:
             MONGO_INITDB_ROOT_USERNAME: root
             MONGO_INITDB_ROOT_PASSWORD: rootpassword
+
+    mongo_seeder:
+        build:
+            context: ./data/
+            dockerfile: Dockerfile
+        depends_on:
+            - mongoDb
+
     web-api:
-        build: 
+        build:
             context: .
             dockerfile: src/HawkSoft.CodingAssessment.Api/Dockerfile
         ports:
