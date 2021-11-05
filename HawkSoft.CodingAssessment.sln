@@ -5,17 +5,19 @@ VisualStudioVersion = 16.0.30114.105
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{999F913B-02D0-44E8-81A5-078380BDBC8C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HawkSoft.CodingAssessment", "src\HawkSoft.CodingAssessment\HawkSoft.CodingAssessment.csproj", "{ECF3490B-FB36-4D26-BD07-240FECBDEDE3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HawkSoft.CodingAssessment", "src\HawkSoft.CodingAssessment\HawkSoft.CodingAssessment.csproj", "{ECF3490B-FB36-4D26-BD07-240FECBDEDE3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HawkSoft.CodingAssessment.Api", "src\HawkSoft.CodingAssessment.Api\HawkSoft.CodingAssessment.Api.csproj", "{CB68B6DD-AE14-4B2C-BB79-A04D65FB6222}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HawkSoft.CodingAssessment.Api", "src\HawkSoft.CodingAssessment.Api\HawkSoft.CodingAssessment.Api.csproj", "{CB68B6DD-AE14-4B2C-BB79-A04D65FB6222}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{B384B694-2767-4526-B47A-547E30967E12}"
+	ProjectSection(SolutionItems) = preProject
+		docker-compose.yml = docker-compose.yml
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{ECF3490B-FB36-4D26-BD07-240FECBDEDE3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -27,8 +29,14 @@ Global
 		{CB68B6DD-AE14-4B2C-BB79-A04D65FB6222}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CB68B6DD-AE14-4B2C-BB79-A04D65FB6222}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{ECF3490B-FB36-4D26-BD07-240FECBDEDE3} = {999F913B-02D0-44E8-81A5-078380BDBC8C}
 		{CB68B6DD-AE14-4B2C-BB79-A04D65FB6222} = {999F913B-02D0-44E8-81A5-078380BDBC8C}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6201ADE6-D34E-4BDA-81C5-11674635BED6}
 	EndGlobalSection
 EndGlobal
