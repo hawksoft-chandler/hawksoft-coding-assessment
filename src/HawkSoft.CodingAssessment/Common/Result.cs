@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace HawkSoft.CodingAssessment.Common
 {
@@ -20,14 +19,6 @@ namespace HawkSoft.CodingAssessment.Common
 
     public class Result : IResult
     {
-        public bool Success { get; protected set; }
-
-        public IEnumerable<string> FailureMessages { get; protected set; }
-
-        public Exception Exception { get; protected set; }
-
-        public bool IsException => Exception != null;
-
         protected Result()
         {
             Success = true;
@@ -45,14 +36,6 @@ namespace HawkSoft.CodingAssessment.Common
             Exception = exception;
         }
 
-        public static Result SuccessResult() => new Result();
-        public static Result FailureResult(IEnumerable<string> messages) => new Result(messages);
-        public static Result FailureResult(string message) => new Result(new[] { message });
-        public static Result ExceptionResult(Exception exception) => new Result(exception);
-    }
-
-    public class Result<T> : IResult<T>
-    {
         public bool Success { get; protected set; }
 
         public IEnumerable<string> FailureMessages { get; protected set; }
@@ -60,13 +43,36 @@ namespace HawkSoft.CodingAssessment.Common
         public Exception Exception { get; protected set; }
 
         public bool IsException => Exception != null;
-        public T Value { get; protected set; }
 
+        public static Result SuccessResult()
+        {
+            return new Result();
+        }
+
+        public static Result FailureResult(IEnumerable<string> messages)
+        {
+            return new Result(messages);
+        }
+
+        public static Result FailureResult(string message)
+        {
+            return new Result(new[] {message});
+        }
+
+        public static Result ExceptionResult(Exception exception)
+        {
+            return new Result(exception);
+        }
+    }
+
+    public class Result<T> : IResult<T>
+    {
         protected Result(T value)
         {
             Value = value;
             Success = true;
         }
+
         protected Result(IEnumerable<string> messages)
         {
             Success = false;
@@ -79,10 +85,33 @@ namespace HawkSoft.CodingAssessment.Common
             Exception = exception;
         }
 
-        public static Result<T> SuccessResult(T value) => new Result<T>(value);
-        public static Result<T> FailureResult(IEnumerable<string> messages) => new Result<T>(messages);
-        public static Result<T> FailureResult(string message) => new Result<T>(new[] { message });
-        public static Result<T> ExceptionResult(Exception exception) => new Result<T>(exception);
+        public bool Success { get; protected set; }
 
+        public IEnumerable<string> FailureMessages { get; protected set; }
+
+        public Exception Exception { get; protected set; }
+
+        public bool IsException => Exception != null;
+        public T Value { get; protected set; }
+
+        public static Result<T> SuccessResult(T value)
+        {
+            return new Result<T>(value);
+        }
+
+        public static Result<T> FailureResult(IEnumerable<string> messages)
+        {
+            return new Result<T>(messages);
+        }
+
+        public static Result<T> FailureResult(string message)
+        {
+            return new Result<T>(new[] {message});
+        }
+
+        public static Result<T> ExceptionResult(Exception exception)
+        {
+            return new Result<T>(exception);
+        }
     }
 }

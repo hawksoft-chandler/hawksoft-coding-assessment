@@ -1,10 +1,6 @@
 ﻿using HawkSoft.CodingAssessment.Common;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace HawkSoft.CodingAssessment.Api.Services
 {
@@ -26,14 +22,11 @@ namespace HawkSoft.CodingAssessment.Api.Services
             else
             {
                 if (result.IsException)
-                {
                     output = new StatusCodeResult(StatusCodes.Status500InternalServerError);
-                }
                 else
-                {
                     output = new BadRequestResult();
-                }
             }
+
             return output;
         }
 
@@ -47,14 +40,11 @@ namespace HawkSoft.CodingAssessment.Api.Services
             else
             {
                 if (result.IsException)
-                {
                     output = new StatusCodeResult(StatusCodes.Status500InternalServerError);
-                }
                 else
-                {
                     output = new BadRequestResult();
-                }
             }
+
             return output;
         }
     }

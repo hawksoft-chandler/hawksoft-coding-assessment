@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace HawkSoft.CodingAssessment.Models
+﻿namespace HawkSoft.CodingAssessment.Models
 {
     public class BusinessContact
     {
