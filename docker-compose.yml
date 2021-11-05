@@ -1,9 +1,16 @@
 version: "3"
 services:
-    my_mongo:
+    mongoDb:
         image: mongo
         ports:
             - 27019:27017
         environment:
             MONGO_INITDB_ROOT_USERNAME: root
             MONGO_INITDB_ROOT_PASSWORD: rootpassword
+    web-api:
+        build: 
+            context: .
+            dockerfile: src/HawkSoft.CodingAssessment.Api/Dockerfile
+        ports:
+            - 80:80
+            - 443:443
