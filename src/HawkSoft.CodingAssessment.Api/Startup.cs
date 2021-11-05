@@ -18,6 +18,7 @@ namespace HawkSoft.CodingAssessment.Api
         
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCodingAssessmentServices();
             services.AddSingleton<IResultNotaryService, ResultNotaryService>();
             services.AddControllers();
         }
