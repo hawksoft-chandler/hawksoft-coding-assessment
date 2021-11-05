@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using HawkSoft.CodingAssessment.Api.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
@@ -12,10 +9,13 @@ namespace HawkSoft.CodingAssessment.Api.Controllers
     public class BusinessContactController : ControllerBase
     {
         private readonly ILogger<BusinessContactController> _logger;
+        private readonly IResultNotaryService _resultNotaryService;
 
-        public BusinessContactController(ILogger<BusinessContactController> logger)
+        public BusinessContactController(ILogger<BusinessContactController> logger,
+                                         IResultNotaryService resultNotaryService)
         {
             _logger = logger;
+            _resultNotaryService = resultNotaryService;
         }
     }
 }
