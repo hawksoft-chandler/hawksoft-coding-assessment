@@ -16,6 +16,7 @@ namespace HawkSoft.CodingAssessment.Data.Repositories
             string userId, int offset, int chunkSize);
 
         Task<IResult> CreateUserContact(CreateUserContactCommand command);
+        Task<IResult> UpdateUserBusinessContact(UpdateUserContactCommand command);
     }
 
     public class BusinessContactRepository : IBusinessContactRepository
@@ -72,8 +73,7 @@ namespace HawkSoft.CodingAssessment.Data.Repositories
                     Address = command.Address
                 };
 
-                var filter = Builders<UserBusinessContactDataEntity>
-                    .Filter.Eq(user => user.Id, command.UserId);
+                var filter = GetUserByIdFilter(command.UserId);
                 var update = Builders<UserBusinessContactDataEntity>
                     .Update.Push(user => user.Contacts, entity);
 
@@ -86,6 +86,51 @@ namespace HawkSoft.CodingAssessment.Data.Repositories
             }
 
             return output;
+        }
+
+        public async Task<IResult> UpdateUserBusinessContact(UpdateUserContactCommand command)
+        {
+            IResult output;
+            try
+            {
+                var filter = GetUserByIdFilter(command.UserId)
+                             & GetUserWithContactByIdFilter(command.ContactId);
+
+                var entity = new BusinessContactDataEntity
+                {
+                    ContactId = command.ContactId,
+                    Name = command.Name,
+                    EmailAddress = command.EmailAddress,
+                    Address = command.Address
+                };
+                var update = Builders<UserBusinessContactDataEntity>.Update.Set("Contacts.$", entity);
+
+                var updateResult = await _dataContext.BusinessContacts.UpdateOneAsync(filter, update);
+
+                if (updateResult.IsAcknowledged && updateResult.ModifiedCount > 0)
+                    output = Result.SuccessResult();
+                else
+                    output = Result.FailureResult("User business contact does not exist.");
+            }
+            catch (Exception ex)
+            {
+                output = Result.ExceptionResult(ex);
+            }
+
+            return output;
+        }
+
+        private FilterDefinition<UserBusinessContactDataEntity> GetUserByIdFilter(string userId)
+        {
+            return Builders<UserBusinessContactDataEntity>.Filter.Eq(user => user.Id, userId);
+        }
+
+        private FilterDefinition<UserBusinessContactDataEntity> GetUserWithContactByIdFilter(string contactId)
+        {
+            return Builders<UserBusinessContactDataEntity>
+                .Filter.ElemMatch(user => user.Contacts,
+                    Builders<BusinessContactDataEntity>
+                        .Filter.Eq(contact => contact.ContactId, contactId));
         }
     }
 }

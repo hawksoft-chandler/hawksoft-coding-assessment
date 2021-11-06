@@ -48,5 +48,20 @@ namespace HawkSoft.CodingAssessment.Api.Controllers
             var result = await _contactService.CreateUserBusinessContact(command);
             return _resultNotaryService.NotarizeResult(result);
         }
+
+        [HttpPut]
+        public async Task<IActionResult> Put(UpdateUserContactRequest request)
+        {
+            var command = new UpdateUserContactCommand()
+            {
+                UserId = request.UserId,
+                ContactId = request.ContactId,
+                Name = request.Name,
+                EmailAddress = request.EmailAddress,
+                Address = request.Address
+            };
+            var result = await _contactService.UpdateUserBusinessContact(command);
+            return _resultNotaryService.NotarizeResult(result);
+        }
     }
 }

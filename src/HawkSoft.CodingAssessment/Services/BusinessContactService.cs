@@ -15,6 +15,7 @@ namespace HawkSoft.CodingAssessment.Services
             string userId, int offset, int chunkSize);
 
         Task<IResult> CreateUserBusinessContact(CreateUserContactCommand command);
+        Task<IResult> UpdateUserBusinessContact(UpdateUserContactCommand command);
     }
 
     public class BusinessContactService : IBusinessContactService
@@ -72,6 +73,33 @@ namespace HawkSoft.CodingAssessment.Services
             return output;
         }
 
+        public async Task<IResult> UpdateUserBusinessContact(UpdateUserContactCommand command)
+        {
+            IResult output;
+            try
+            {
+                var validationResult = ValidateUpdateUserContactCommand(command);
+                if (validationResult.Success)
+                {
+                    output = await _contactRepository.UpdateUserBusinessContact(command);
+                }
+                else
+                {
+                    output = Result.FailureResult(validationResult.FailureMessages);
+                }
+            }
+            catch (Exception ex)
+            {
+                output = Result.ExceptionResult(ex);
+            }
+
+            return output;
+        }
+
+        private IResult ValidateUpdateUserContactCommand(UpdateUserContactCommand command)
+        {
+            return Result.SuccessResult();
+        }
         private IResult ValidateCreateUserContactCommand(CreateUserContactCommand command)
         {
             // Here we would validate the values against business rules
