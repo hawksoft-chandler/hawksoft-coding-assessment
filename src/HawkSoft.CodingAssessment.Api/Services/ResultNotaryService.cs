@@ -24,7 +24,7 @@ namespace HawkSoft.CodingAssessment.Api.Services
                 if (result.IsException)
                     output = new StatusCodeResult(StatusCodes.Status500InternalServerError);
                 else
-                    output = new BadRequestResult();
+                    output = new BadRequestObjectResult(result.FailureMessages);
             }
 
             return output;
@@ -42,7 +42,7 @@ namespace HawkSoft.CodingAssessment.Api.Services
                 if (result.IsException)
                     output = new StatusCodeResult(StatusCodes.Status500InternalServerError);
                 else
-                    output = new BadRequestResult();
+                    output = new BadRequestObjectResult(result.FailureMessages);
             }
 
             return output;
