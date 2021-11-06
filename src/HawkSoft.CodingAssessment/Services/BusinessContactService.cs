@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using HawkSoft.CodingAssessment.Common;
 using HawkSoft.CodingAssessment.Data.Repositories;
 using HawkSoft.CodingAssessment.Models;
+using HawkSoft.CodingAssessment.Models.Commands;
 using Microsoft.Extensions.Logging;
 
 namespace HawkSoft.CodingAssessment.Services
@@ -12,6 +13,8 @@ namespace HawkSoft.CodingAssessment.Services
     {
         Task<IResult<IEnumerable<BusinessContact>>> GetUserBusinessContactsPaginated(
             string userId, int offset, int chunkSize);
+
+        Task<IResult> CreateUserBusinessContact(CreateUserContactCommand command);
     }
 
     public class BusinessContactService : IBusinessContactService
@@ -46,8 +49,38 @@ namespace HawkSoft.CodingAssessment.Services
             return output;
         }
 
+        public async Task<IResult> CreateUserBusinessContact(CreateUserContactCommand command)
+        {
+            IResult output;
+            try
+            {
+                var validationResult = ValidateCreateUserContactCommand(command);
+                if (validationResult.Success)
+                {
+                    output = await _contactRepository.CreateUserContact(command);
+                }
+                else
+                {
+                    output = Result.FailureResult(validationResult.FailureMessages);
+                }
+            }
+            catch(Exception ex)
+            {
+                output = Result.ExceptionResult(ex);
+            }
+
+            return output;
+        }
+
+        private IResult ValidateCreateUserContactCommand(CreateUserContactCommand command)
+        {
+            // Here we would validate the values against business rules
+            command.ContactId = Guid.NewGuid().ToString();
+            return Result.SuccessResult();
+        }
         private IResult ValidateUserPaginationValues(string userId, int offset, int chunkSize)
         {
+            // Here we would validate the values against business rules
             return Result.SuccessResult();
         }
     }
