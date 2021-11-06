@@ -1,6 +1,8 @@
 ﻿using System.Threading.Tasks;
+using HawkSoft.CodingAssessment.Api.Models.Requests;
 using HawkSoft.CodingAssessment.Api.Services;
 using HawkSoft.CodingAssessment.Data.Repositories;
+using HawkSoft.CodingAssessment.Models.Commands;
 using HawkSoft.CodingAssessment.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -25,9 +27,9 @@ namespace HawkSoft.CodingAssessment.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Get(string userId, int offset = 0, int chunkSize = 10)
+        public async Task<IActionResult> Get([FromQuery]GetUserContactsPaginatedRequest request)
         {
-            var result = await _contactService.GetUserBusinessContactsPaginated(userId, offset, chunkSize);
+            var result = await _contactService.GetUserBusinessContactsPaginated(request.UserId, request.Offset, request.ChunkSize);
             return _resultNotaryService.NotarizeResult(result);
         }
     }
