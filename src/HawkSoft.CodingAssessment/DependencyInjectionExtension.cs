@@ -1,5 +1,6 @@
 ﻿using HawkSoft.CodingAssessment.Data;
 using HawkSoft.CodingAssessment.Data.Repositories;
+using HawkSoft.CodingAssessment.Services;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace HawkSoft.CodingAssessment
@@ -10,8 +11,8 @@ namespace HawkSoft.CodingAssessment
         {
             services.AddScoped<IUserContactMongoDataContext, UserContactMongoDataContext>();
             services.AddScoped<IBusinessContactRepository, BusinessContactRepository>();
-
-            return services;
+            services.AddScoped<IBusinessContactService, BusinessContactService>();
+            return services;;
         }
     }
 }
