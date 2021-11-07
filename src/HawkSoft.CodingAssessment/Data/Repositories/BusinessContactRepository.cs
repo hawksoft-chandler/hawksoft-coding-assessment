@@ -5,6 +5,7 @@ using HawkSoft.CodingAssessment.Common;
 using HawkSoft.CodingAssessment.Data.Entities;
 using HawkSoft.CodingAssessment.Models;
 using HawkSoft.CodingAssessment.Models.Commands;
+using HawkSoft.CodingAssessment.Models.Queries;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
 
@@ -12,8 +13,8 @@ namespace HawkSoft.CodingAssessment.Data.Repositories
 {
     public interface IBusinessContactRepository
     {
-        public Task<IResult<IEnumerable<BusinessContact>>> GetUserContactsPaginated(
-            string userId, int offset, int chunkSize);
+        Task<IResult<IEnumerable<BusinessContact>>> GetUserContactsPaginated(
+            GetUserContactsPaginatedQuery query);
 
         Task<IResult> CreateUserContact(CreateUserContactCommand command);
         Task<IResult> UpdateUserBusinessContact(UpdateUserContactCommand command);
@@ -30,7 +31,7 @@ namespace HawkSoft.CodingAssessment.Data.Repositories
         }
 
         public async Task<IResult<IEnumerable<BusinessContact>>> GetUserContactsPaginated(
-            string userId, int offset, int chunkSize)
+            GetUserContactsPaginatedQuery query)
         {
             IResult<IEnumerable<BusinessContact>> output;
             try
@@ -38,10 +39,10 @@ namespace HawkSoft.CodingAssessment.Data.Repositories
                 var queryableCollection = _dataContext.BusinessContacts.AsQueryable();
 
                 var list = await queryableCollection
-                    .Where(x => x.Id == userId)
+                    .Where(x => x.Id == query.UserId)
                     .SelectMany(x => x.Contacts)
-                    .Skip(offset)
-                    .Take(chunkSize)
+                    .Skip(query.Offset)
+                    .Take(query.ChunkSize)
                     .Select(x => new BusinessContact
                     {
                         Id = x.ContactId,

@@ -5,6 +5,7 @@ using HawkSoft.CodingAssessment.Common;
 using HawkSoft.CodingAssessment.Data.Repositories;
 using HawkSoft.CodingAssessment.Models;
 using HawkSoft.CodingAssessment.Models.Commands;
+using HawkSoft.CodingAssessment.Models.Queries;
 using Microsoft.Extensions.Logging;
 
 namespace HawkSoft.CodingAssessment.Services
@@ -12,7 +13,7 @@ namespace HawkSoft.CodingAssessment.Services
     public interface IBusinessContactService
     {
         Task<IResult<IEnumerable<BusinessContact>>> GetUserBusinessContactsPaginated(
-            string userId, int offset, int chunkSize);
+            GetUserContactsPaginatedQuery query);
 
         Task<IResult> CreateUserBusinessContact(CreateUserContactCommand command);
         Task<IResult> UpdateUserBusinessContact(UpdateUserContactCommand command);
@@ -32,14 +33,14 @@ namespace HawkSoft.CodingAssessment.Services
         }
 
         public async Task<IResult<IEnumerable<BusinessContact>>> GetUserBusinessContactsPaginated(
-            string userId, int offset, int chunkSize)
+            GetUserContactsPaginatedQuery query)
         {
             IResult<IEnumerable<BusinessContact>> output;
             try
             {
-                var validationResult = ValidateUserPaginationValues(userId, offset, chunkSize);
+                var validationResult = ValidateGetUserContactsPaginatedQuery(query);
                 if (validationResult.Success)
-                    output = await _contactRepository.GetUserContactsPaginated(userId, offset, chunkSize);
+                    output = await _contactRepository.GetUserContactsPaginated(query);
                 else
                     output = Result<IEnumerable<BusinessContact>>.FailureResult(validationResult.FailureMessages);
             }
@@ -125,7 +126,7 @@ namespace HawkSoft.CodingAssessment.Services
             return Result.SuccessResult();
         }
 
-        private IResult ValidateUserPaginationValues(string userId, int offset, int chunkSize)
+        private IResult ValidateGetUserContactsPaginatedQuery(GetUserContactsPaginatedQuery query)
         {
             // Here we would validate the values against business rules
             return Result.SuccessResult();
