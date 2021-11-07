@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using HawkSoft.CodingAssessment.Api.Models.Requests;
 using HawkSoft.CodingAssessment.Api.Services;
 using HawkSoft.CodingAssessment.Models.Commands;
@@ -46,6 +47,7 @@ namespace HawkSoft.CodingAssessment.Api.Controllers
             var command = new CreateUserContactCommand
             {
                 UserId = request.UserId,
+                ContactId = Guid.NewGuid().ToString(),
                 Name = request.Name,
                 EmailAddress = request.EmailAddress,
                 Address = request.Address
