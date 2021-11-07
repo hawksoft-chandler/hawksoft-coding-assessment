@@ -17,6 +17,7 @@ namespace HawkSoft.CodingAssessment.Data.Repositories
 
         Task<IResult> CreateUserContact(CreateUserContactCommand command);
         Task<IResult> UpdateUserBusinessContact(UpdateUserContactCommand command);
+        Task<IResult> DeleteUserBusinessContact(DeleteUserContactCommand command);
     }
 
     public class BusinessContactRepository : IBusinessContactRepository
@@ -93,8 +94,7 @@ namespace HawkSoft.CodingAssessment.Data.Repositories
             IResult output;
             try
             {
-                var filter = GetUserByIdFilter(command.UserId)
-                             & GetUserWithContactByIdFilter(command.ContactId);
+                var filter = GetUserContactPositionFilterByIdsFilter(command.UserId, command.ContactId);
 
                 var entity = new BusinessContactDataEntity
                 {
@@ -120,6 +120,35 @@ namespace HawkSoft.CodingAssessment.Data.Repositories
             return output;
         }
 
+        public async Task<IResult> DeleteUserBusinessContact(DeleteUserContactCommand command)
+        {
+            IResult output;
+            try
+            {
+                var userFilter = GetUserByIdFilter(command.UserId);
+                var contactFilter = GetContactByIdFilter(command.ContactId);
+                var update =
+                    Builders<UserBusinessContactDataEntity>.Update.PullFilter(user => user.Contacts, contactFilter);
+                var deleteResult = await _dataContext.BusinessContacts.UpdateOneAsync(userFilter, update);
+                if (deleteResult.IsAcknowledged && deleteResult.ModifiedCount > 0)
+                    output = Result.SuccessResult();
+                else
+                    output = Result.FailureResult("User business contact does not exist.");
+            }
+            catch (Exception ex)
+            {
+                output = Result.ExceptionResult(ex);
+            }
+
+            return output;
+        }
+
+        private FilterDefinition<UserBusinessContactDataEntity> GetUserContactPositionFilterByIdsFilter(
+            string userId, string contactId)
+        {
+            return GetUserByIdFilter(userId) & GetUserWithContactByIdFilter(contactId);
+        }
+
         private FilterDefinition<UserBusinessContactDataEntity> GetUserByIdFilter(string userId)
         {
             return Builders<UserBusinessContactDataEntity>.Filter.Eq(user => user.Id, userId);
@@ -128,9 +157,14 @@ namespace HawkSoft.CodingAssessment.Data.Repositories
         private FilterDefinition<UserBusinessContactDataEntity> GetUserWithContactByIdFilter(string contactId)
         {
             return Builders<UserBusinessContactDataEntity>
-                .Filter.ElemMatch(user => user.Contacts,
-                    Builders<BusinessContactDataEntity>
-                        .Filter.Eq(contact => contact.ContactId, contactId));
+                    .Filter.ElemMatch(user => user.Contacts, GetContactByIdFilter(contactId))
+                ;
+        }
+
+        private FilterDefinition<BusinessContactDataEntity> GetContactByIdFilter(string contactId)
+        {
+            return Builders<BusinessContactDataEntity>
+                .Filter.Eq(contact => contact.ContactId, contactId);
         }
     }
 }

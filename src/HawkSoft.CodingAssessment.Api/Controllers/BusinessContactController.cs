@@ -63,5 +63,18 @@ namespace HawkSoft.CodingAssessment.Api.Controllers
             var result = await _contactService.UpdateUserBusinessContact(command);
             return _resultNotaryService.NotarizeResult(result);
         }
+
+        [HttpDelete]
+        public async Task<IActionResult> Delete([FromQuery] DeleteUserContactRequest request)
+        {
+            var command = new DeleteUserContactCommand
+            {
+                UserId = request.UserId,
+                ContactId = request.ContactId
+            };
+
+            var result = await _contactService.DeleteUserBusinessContact(command);
+            return _resultNotaryService.NotarizeResult(result);
+        }
     }
 }

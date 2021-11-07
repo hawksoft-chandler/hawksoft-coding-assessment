@@ -16,12 +16,13 @@ namespace HawkSoft.CodingAssessment.Services
 
         Task<IResult> CreateUserBusinessContact(CreateUserContactCommand command);
         Task<IResult> UpdateUserBusinessContact(UpdateUserContactCommand command);
+        Task<IResult> DeleteUserBusinessContact(DeleteUserContactCommand command);
     }
 
     public class BusinessContactService : IBusinessContactService
     {
-        private readonly ILogger<BusinessContactService> _logger;
         private readonly IBusinessContactRepository _contactRepository;
+        private readonly ILogger<BusinessContactService> _logger;
 
         public BusinessContactService(ILogger<BusinessContactService> logger,
                                       IBusinessContactRepository contactRepository)
@@ -57,15 +58,11 @@ namespace HawkSoft.CodingAssessment.Services
             {
                 var validationResult = ValidateCreateUserContactCommand(command);
                 if (validationResult.Success)
-                {
                     output = await _contactRepository.CreateUserContact(command);
-                }
                 else
-                {
                     output = Result.FailureResult(validationResult.FailureMessages);
-                }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 output = Result.ExceptionResult(ex);
             }
@@ -80,13 +77,9 @@ namespace HawkSoft.CodingAssessment.Services
             {
                 var validationResult = ValidateUpdateUserContactCommand(command);
                 if (validationResult.Success)
-                {
                     output = await _contactRepository.UpdateUserBusinessContact(command);
-                }
                 else
-                {
                     output = Result.FailureResult(validationResult.FailureMessages);
-                }
             }
             catch (Exception ex)
             {
@@ -96,16 +89,42 @@ namespace HawkSoft.CodingAssessment.Services
             return output;
         }
 
+        public async Task<IResult> DeleteUserBusinessContact(DeleteUserContactCommand command)
+        {
+            IResult output;
+            try
+            {
+                var validationResult = ValidateDeleteUserContactCommand(command);
+                if (validationResult.Success)
+                    output = await _contactRepository.DeleteUserBusinessContact(command);
+                else
+                    output = Result.FailureResult(validationResult.FailureMessages);
+            }
+            catch (Exception ex)
+            {
+                output = Result.ExceptionResult(ex);
+            }
+
+            return output;
+        }
+
+        private IResult ValidateDeleteUserContactCommand(DeleteUserContactCommand command)
+        {
+            return Result.SuccessResult();
+        }
+
         private IResult ValidateUpdateUserContactCommand(UpdateUserContactCommand command)
         {
             return Result.SuccessResult();
         }
+
         private IResult ValidateCreateUserContactCommand(CreateUserContactCommand command)
         {
             // Here we would validate the values against business rules
             command.ContactId = Guid.NewGuid().ToString();
             return Result.SuccessResult();
         }
+
         private IResult ValidateUserPaginationValues(string userId, int offset, int chunkSize)
         {
             // Here we would validate the values against business rules
