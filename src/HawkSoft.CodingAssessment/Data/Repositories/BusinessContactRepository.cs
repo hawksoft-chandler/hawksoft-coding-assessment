@@ -111,7 +111,7 @@ namespace HawkSoft.CodingAssessment.Data.Repositories
                 session.StartTransaction();
                 var updateResult = await _dataContext.BusinessContacts.UpdateOneAsync(filter, update);
 
-                if (updateResult.IsAcknowledged && updateResult.ModifiedCount > 0)
+                if (updateResult.IsAcknowledged && updateResult.MatchedCount > 0)
                 {
                     output = Result.SuccessResult();
                     await session.CommitTransactionAsync();
