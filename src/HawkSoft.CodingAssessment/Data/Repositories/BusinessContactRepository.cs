@@ -94,7 +94,7 @@ namespace HawkSoft.CodingAssessment.Data.Repositories
         {
             IResult output;
 
-            using var session = await _dataContext.StartSessionAsync();
+            //using var session = await _dataContext.StartSessionAsync();
             try
             {
                 var filter = GetUserContactPositionFilterByIdsFilter(command.UserId, command.ContactId);
@@ -108,18 +108,18 @@ namespace HawkSoft.CodingAssessment.Data.Repositories
                 };
                 var update = Builders<UserBusinessContactDataEntity>.Update.Set("Contacts.$", entity);
 
-                session.StartTransaction();
+                //session.StartTransaction();
                 var updateResult = await _dataContext.BusinessContacts.UpdateOneAsync(filter, update);
 
                 if (updateResult.IsAcknowledged && updateResult.MatchedCount > 0)
                 {
                     output = Result.SuccessResult();
-                    await session.CommitTransactionAsync();
+                    //await session.CommitTransactionAsync();
                 }
                 else
                 {
                     output = Result.FailureResult("User business contact does not exist.");
-                    await session.AbortTransactionAsync();
+                    //await session.AbortTransactionAsync();
                 }
             }
             catch (Exception ex)
@@ -128,7 +128,7 @@ namespace HawkSoft.CodingAssessment.Data.Repositories
             }
             finally
             {
-                if (session.IsInTransaction) await session.AbortTransactionAsync();
+                //if (session.IsInTransaction) await session.AbortTransactionAsync();
             }
 
             return output;
@@ -137,7 +137,7 @@ namespace HawkSoft.CodingAssessment.Data.Repositories
         public async Task<IResult> DeleteUserBusinessContact(DeleteUserContactCommand command)
         {
             IResult output;
-            var session = await _dataContext.StartSessionAsync();
+            //var session = await _dataContext.StartSessionAsync();
             try
             {
                 var userFilter = GetUserByIdFilter(command.UserId);
@@ -145,17 +145,17 @@ namespace HawkSoft.CodingAssessment.Data.Repositories
                 var update =
                     Builders<UserBusinessContactDataEntity>.Update.PullFilter(user => user.Contacts, contactFilter);
 
-                session.StartTransaction();
+                //session.StartTransaction();
                 var deleteResult = await _dataContext.BusinessContacts.UpdateOneAsync(userFilter, update);
                 if (deleteResult.IsAcknowledged && deleteResult.ModifiedCount > 0)
                 {
                     output = Result.SuccessResult();
-                    await session.CommitTransactionAsync();
+                    //await session.CommitTransactionAsync();
                 }
                 else
                 {
                     output = Result.FailureResult("User business contact does not exist.");
-                    await session.AbortTransactionAsync();
+                    //await session.AbortTransactionAsync();
                 }
             }
             catch (Exception ex)
@@ -164,7 +164,7 @@ namespace HawkSoft.CodingAssessment.Data.Repositories
             }
             finally
             {
-                if (session.IsInTransaction) await session.AbortTransactionAsync();
+                //if (session.IsInTransaction) await session.AbortTransactionAsync();
             }
 
             return output;
