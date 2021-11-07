@@ -93,6 +93,8 @@ namespace HawkSoft.CodingAssessment.Data.Repositories
         public async Task<IResult> UpdateUserBusinessContact(UpdateUserContactCommand command)
         {
             IResult output;
+
+            using var session = await _dataContext.StartSessionAsync();
             try
             {
                 var filter = GetUserContactPositionFilterByIdsFilter(command.UserId, command.ContactId);
@@ -106,16 +108,27 @@ namespace HawkSoft.CodingAssessment.Data.Repositories
                 };
                 var update = Builders<UserBusinessContactDataEntity>.Update.Set("Contacts.$", entity);
 
+                session.StartTransaction();
                 var updateResult = await _dataContext.BusinessContacts.UpdateOneAsync(filter, update);
 
                 if (updateResult.IsAcknowledged && updateResult.ModifiedCount > 0)
+                {
                     output = Result.SuccessResult();
+                    await session.CommitTransactionAsync();
+                }
                 else
+                {
                     output = Result.FailureResult("User business contact does not exist.");
+                    await session.AbortTransactionAsync();
+                }
             }
             catch (Exception ex)
             {
                 output = Result.ExceptionResult(ex);
+            }
+            finally
+            {
+                if (session.IsInTransaction) await session.AbortTransactionAsync();
             }
 
             return output;
@@ -124,21 +137,34 @@ namespace HawkSoft.CodingAssessment.Data.Repositories
         public async Task<IResult> DeleteUserBusinessContact(DeleteUserContactCommand command)
         {
             IResult output;
+            var session = await _dataContext.StartSessionAsync();
             try
             {
                 var userFilter = GetUserByIdFilter(command.UserId);
                 var contactFilter = GetContactByIdFilter(command.ContactId);
                 var update =
                     Builders<UserBusinessContactDataEntity>.Update.PullFilter(user => user.Contacts, contactFilter);
+
+                session.StartTransaction();
                 var deleteResult = await _dataContext.BusinessContacts.UpdateOneAsync(userFilter, update);
                 if (deleteResult.IsAcknowledged && deleteResult.ModifiedCount > 0)
+                {
                     output = Result.SuccessResult();
+                    await session.CommitTransactionAsync();
+                }
                 else
+                {
                     output = Result.FailureResult("User business contact does not exist.");
+                    await session.AbortTransactionAsync();
+                }
             }
             catch (Exception ex)
             {
                 output = Result.ExceptionResult(ex);
+            }
+            finally
+            {
+                if (session.IsInTransaction) await session.AbortTransactionAsync();
             }
 
             return output;
