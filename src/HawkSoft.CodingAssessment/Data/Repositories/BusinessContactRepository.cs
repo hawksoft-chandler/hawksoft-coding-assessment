@@ -6,6 +6,7 @@ using HawkSoft.CodingAssessment.Data.Entities;
 using HawkSoft.CodingAssessment.Models;
 using HawkSoft.CodingAssessment.Models.Commands;
 using HawkSoft.CodingAssessment.Models.Queries;
+using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
 
@@ -24,21 +25,26 @@ namespace HawkSoft.CodingAssessment.Data.Repositories
     public class BusinessContactRepository : IBusinessContactRepository
     {
         private readonly IUserContactMongoDataContext _dataContext;
+        private readonly ILogger<BusinessContactRepository> _logger;
 
-        public BusinessContactRepository(IUserContactMongoDataContext dataContext)
+        public BusinessContactRepository(ILogger<BusinessContactRepository> logger,
+                                         IUserContactMongoDataContext dataContext)
         {
+            _logger = logger;
             _dataContext = dataContext;
         }
 
         public async Task<IResult<IEnumerable<BusinessContact>>> GetUserContactsPaginated(
             GetUserContactsPaginatedQuery query)
         {
+            _logger.LogTrace("Entering function {functionName}", nameof(GetUserContactsPaginated));
             IResult<IEnumerable<BusinessContact>> output;
             try
             {
                 var queryableCollection = _dataContext.BusinessContacts.AsQueryable();
 
-                var list = await queryableCollection
+                _logger.LogTrace("Creating database query");
+                var databaseQuery =  queryableCollection
                     .Where(x => x.Id == query.UserId)
                     .SelectMany(x => x.Contacts)
                     .Skip(query.Offset)
@@ -49,24 +55,31 @@ namespace HawkSoft.CodingAssessment.Data.Repositories
                         Name = x.Name,
                         EmailAddress = x.EmailAddress,
                         Address = x.Address
-                    })
-                    .ToListAsync();
+                    });
+
+                _logger.LogTrace("Executing database query");
+                var list = await databaseQuery.ToListAsync();
 
                 output = Result<IEnumerable<BusinessContact>>.SuccessResult(list);
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "{serviceName}.{functionName}: Unhandled exception caught.",
+                    nameof(BusinessContactRepository), nameof(GetUserContactsPaginated));
                 output = Result<IEnumerable<BusinessContact>>.ExceptionResult(ex);
             }
 
+            _logger.LogTrace("Exiting function {functionName}", nameof(GetUserContactsPaginated));
             return output;
         }
 
         public async Task<IResult> CreateUserContact(CreateUserContactCommand command)
         {
+            _logger.LogTrace("Entering function {functionName}", nameof(CreateUserContact));
             IResult output;
             try
             {
+                _logger.LogTrace("Converting command into data entity.");
                 var entity = new BusinessContactDataEntity
                 {
                     ContactId = command.ContactId,
@@ -75,23 +88,33 @@ namespace HawkSoft.CodingAssessment.Data.Repositories
                     Address = command.Address
                 };
 
+                _logger.LogTrace("Calling {filterName} to get filter.", nameof(GetUserByIdFilter));
                 var filter = GetUserByIdFilter(command.UserId);
+
+                _logger.LogTrace("Creating update definition.");
                 var update = Builders<UserBusinessContactDataEntity>
                     .Update.Push(user => user.Contacts, entity);
 
+                _logger.LogTrace("Executing update command");
                 await _dataContext.BusinessContacts.FindOneAndUpdateAsync(filter, update);
+                _logger.LogInformation("Added contact {contactId} to user {userId}", command.ContactId, command.UserId);
+
                 output = Result.SuccessResult();
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "{serviceName}.{functionName}: Unhandled exception caught.",
+                    nameof(BusinessContactRepository), nameof(CreateUserContact));
                 output = Result.ExceptionResult(ex);
             }
 
+            _logger.LogTrace("Exiting function {functionName}", nameof(CreateUserContact));
             return output;
         }
 
         public async Task<IResult> UpdateUserBusinessContact(UpdateUserContactCommand command)
         {
+            _logger.LogTrace("Entering function {functionName}", nameof(UpdateUserBusinessContact));
             IResult output;
 
             //using var session = await _dataContext.StartSessionAsync();
@@ -112,30 +135,26 @@ namespace HawkSoft.CodingAssessment.Data.Repositories
                 var updateResult = await _dataContext.BusinessContacts.UpdateOneAsync(filter, update);
 
                 if (updateResult.IsAcknowledged && updateResult.MatchedCount > 0)
-                {
                     output = Result.SuccessResult();
-                    //await session.CommitTransactionAsync();
-                }
+                //await session.CommitTransactionAsync();
                 else
-                {
                     output = Result.FailureResult("User business contact does not exist.");
-                    //await session.AbortTransactionAsync();
-                }
+                //await session.AbortTransactionAsync();
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "{serviceName}.{functionName}: Unhandled exception caught.",
+                    nameof(BusinessContactRepository), nameof(UpdateUserBusinessContact));
                 output = Result.ExceptionResult(ex);
             }
-            finally
-            {
-                //if (session.IsInTransaction) await session.AbortTransactionAsync();
-            }
 
+            _logger.LogTrace("Exiting function {functionName}", nameof(UpdateUserBusinessContact));
             return output;
         }
 
         public async Task<IResult> DeleteUserBusinessContact(DeleteUserContactCommand command)
         {
+            _logger.LogTrace("Entering function {functionName}", nameof(DeleteUserBusinessContact));
             IResult output;
             //var session = await _dataContext.StartSessionAsync();
             try
@@ -148,25 +167,20 @@ namespace HawkSoft.CodingAssessment.Data.Repositories
                 //session.StartTransaction();
                 var deleteResult = await _dataContext.BusinessContacts.UpdateOneAsync(userFilter, update);
                 if (deleteResult.IsAcknowledged && deleteResult.ModifiedCount > 0)
-                {
                     output = Result.SuccessResult();
-                    //await session.CommitTransactionAsync();
-                }
+                //await session.CommitTransactionAsync();
                 else
-                {
                     output = Result.FailureResult("User business contact does not exist.");
-                    //await session.AbortTransactionAsync();
-                }
+                //await session.AbortTransactionAsync();
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "{serviceName}.{functionName}: Unhandled exception caught.",
+                    nameof(BusinessContactRepository), nameof(DeleteUserBusinessContact));
                 output = Result.ExceptionResult(ex);
             }
-            finally
-            {
-                //if (session.IsInTransaction) await session.AbortTransactionAsync();
-            }
 
+            _logger.LogTrace("Exiting function {functionName}", nameof(DeleteUserBusinessContact));
             return output;
         }
 
