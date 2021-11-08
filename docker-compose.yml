@@ -1,24 +1,20 @@
 version: "3"
+
 services:
     mongoDb:
         image: mongo
-        ports:
-            - 27019:27017
-        environment:
-            MONGO_INITDB_ROOT_USERNAME: root
-            MONGO_INITDB_ROOT_PASSWORD: rootpassword
-
+        container_name: api-mongo
     mongo_seeder:
         build:
             context: ./data/
             dockerfile: Dockerfile
         depends_on:
             - mongoDb
-
     web-api:
+        container_name: web-api
         build:
             context: .
             dockerfile: src/HawkSoft.CodingAssessment.Api/Dockerfile
-        ports:
-            - 80:80
-            - 443:443
+        depends_on:
+            - mongoDb
+            - mongo_seeder
